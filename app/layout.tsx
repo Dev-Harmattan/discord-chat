@@ -1,9 +1,11 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Open_Sans } from 'next/font/google';
-import { ClerkProvider } from '@clerk/nextjs';
-import { ThemeProvider } from '@/components/theme-provider';
 import { cn } from '@/lib/utils';
+import { ClerkProvider } from '@clerk/nextjs';
+
+import { ThemeProvider } from '@/components/providers/theme-provider';
+import ModalProvider from '@/components/providers/modal-provider';
 
 const font = Open_Sans({ subsets: ['latin'] });
 
@@ -25,8 +27,9 @@ export default function RootLayout({
             attribute="class"
             defaultTheme="dark"
             enableSystem={false}
-            storageKey="discord-chat-theme"
+            storageKey="discord-chat"
           >
+            <ModalProvider />
             {children}
           </ThemeProvider>
         </body>
