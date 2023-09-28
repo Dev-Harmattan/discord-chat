@@ -68,6 +68,7 @@ const CreateServerModal = () => {
      form.reset();
      onClose();
    };
+   
 
    return (
      <Dialog open={isModalOpen} onOpenChange={handleClose}>
