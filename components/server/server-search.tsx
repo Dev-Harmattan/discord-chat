@@ -50,7 +50,6 @@ const ServerSearch = ({ data }: ServerSearchProps) => {
     type: 'channel' | 'member';
   }) => {
     setOpen(false);
-    console.log('Clicked channel');
     if (type === 'member') {
       router.push(`/servers/${params?.serverId}/conversation/${id}`);
     }
@@ -83,10 +82,7 @@ const ServerSearch = ({ data }: ServerSearchProps) => {
             return (
               <CommandGroup key={label} heading={label}>
                 {data.map(({ icon, id, name }) => (
-                  <CommandItem
-                    onSelect={() => onClick({id, type})}
-                    key={id}
-                  >
+                  <CommandItem onSelect={() => onClick({ id, type })} key={id}>
                     {icon}
                     <span>{name}</span>
                   </CommandItem>

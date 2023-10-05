@@ -26,7 +26,6 @@ import {
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import FileUpload from '@/components/file-upload';
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -35,6 +34,7 @@ import axios from 'axios';
 import { useParams, useRouter } from 'next/navigation';
 import { useModal } from '@/hooks/use-modal-store';
 import { TypeEnum } from '@prisma/client';
+import { useEffect } from 'react';
 
 const formSchema = z.object({
   name: z
@@ -52,9 +52,11 @@ const formSchema = z.object({
 });
 
 const CreateChannelModal = () => {
-  const { isOpen, onClose, type } = useModal();
+  const { isOpen, onClose, type, data } = useModal();
   const router = useRouter();
   const params = useParams();
+
+  const { channelType } = data;
 
   const isModalOpen = isOpen && type === 'createChannel';
 
@@ -62,9 +64,17 @@ const CreateChannelModal = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      type: TypeEnum.TEXT,
+      type: channelType || TypeEnum.TEXT,
     },
   });
+
+  useEffect(() => {
+    if (channelType) {
+      form.setValue('type', channelType);
+    } else {
+      form.setValue('type', TypeEnum.TEXT);
+    }
+  }, [channelType, form]);
 
   const isLoading = form.formState.isSubmitting;
 
