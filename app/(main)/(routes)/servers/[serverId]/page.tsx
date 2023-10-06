@@ -28,7 +28,7 @@ const ServerIdPage = async ({ params }: ServerIdPage) => {
           name: 'general',
         },
         orderBy: {
-          created_at: 'asc',
+          createdAt: 'asc'
         },
       },
     },
