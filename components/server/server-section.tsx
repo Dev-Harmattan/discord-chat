@@ -20,7 +20,6 @@ const ServerSection = ({
   role,
   server,
 }: ServerSectionProps) => {
-  console.log('Response', channelType);
   const { onOpen } = useModal();
   return (
     <div className="flex items-center justify-between py-2">
