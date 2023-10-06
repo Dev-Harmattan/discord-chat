@@ -48,6 +48,11 @@ enum MemberRole {
 model Member {
   id String @id @default(uuid())
   role MemberRole @default(GUEST)
+  messages Message[]
+  directMessages DirectMessage[]
+
+  conversationsInitiated Conversation[] @relation("memberOne")
+  conversationsRecieved Conversation[] @relation("memberTwo")
 
   serverId String
   server Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
@@ -70,6 +75,8 @@ model Channel {
   name String
   type TypeEnum @default(TEXT)
 
+  messages Message[]
+
   profileId String
   profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
@@ -81,4 +88,61 @@ model Channel {
   
   @@index([profileId])
   @@index([serverId])
+}
+
+model Message {
+  id String @id @default(uuid())
+  content String @db.Text
+  fileUrl String @db.Text
+
+  delete Boolean @default(false)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  memberId String
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  channelId String
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  
+  @@index([memberId])
+  @@index([channelId])
+
+}
+
+model Conversation { 
+  id String @id @default(uuid())
+
+  directMessages DirectMessage[]
+
+  memberOneId String
+  memberOne Member @relation("memberOne", fields: [memberOneId], references: [id], onDelete: Cascade)
+
+  memberTwoId String
+  memberTwo Member @relation("memberTwo", fields: [memberTwoId], references: [id], onDelete: Cascade)
+
+  @@index([memberTwoId])
+
+  @@unique([memberOneId, memberTwoId])
+}
+
+model DirectMessage {
+  id String @id @default(uuid())
+  content String @db.Text
+  fileUrl String @db.Text
+  deleted Boolean @default(false)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  memberId String
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  conversationId String
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([memberId])
+  @@index([conversationId])
 }
