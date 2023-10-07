@@ -58,6 +58,10 @@ const ServerSearch = ({ data }: ServerSearchProps) => {
       router.push(`/servers/${params?.serverId}/channels/${id}`);
     }
   };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
   return (
     <>
       <button
@@ -72,7 +76,7 @@ const ServerSearch = ({ data }: ServerSearchProps) => {
           <span className="text-xm">⌘</span>K
         </kbd>
       </button>
-      <CommandDialog open={open}>
+      <CommandDialog open={open} onOpenChange={handleClose}>
         <CommandInput placeholder="Search all channels and members" />
         <CommandList>
           <CommandEmpty>No result</CommandEmpty>
