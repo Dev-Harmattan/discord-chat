@@ -1,14 +1,24 @@
 'use client';
 
-import { Member, Message, Profile } from '@prisma/client';
-import ChatWelcome from './chat-welcome';
-import { useChatQuery } from '@/hooks/use-chat-query';
-import { format } from 'date-fns';
-import { Loader2, ServerCrash } from 'lucide-react';
 import { Fragment, useRef, ElementRef } from 'react';
-import { ChatItem } from './chat-item';
+import { format } from 'date-fns';
+import { Member, Message, Profile } from '@prisma/client';
+import { Loader2, ServerCrash } from 'lucide-react';
+
+import { useChatQuery } from '@/hooks/use-chat-query';
 import { useChatSocket } from '@/hooks/use-chat-socket';
 import { useChatScroll } from '@/hooks/use-chat-scroll';
+
+import { ChatItem } from './chat-item';
+import ChatWelcome from './chat-welcome';
+
+const DATE_FORMAT = 'd MMM yyyy, HH:mm';
+
+type MessageWithMemberWithProfile = Message & {
+  member: Member & {
+    profile: Profile;
+  };
+};
 
 interface ChatMessagesProps {
   name: string;
@@ -22,14 +32,6 @@ interface ChatMessagesProps {
   type: 'channel' | 'conversation';
 }
 
-type MessageWithMemberWithProfile = Message & {
-  member: Member & {
-    profile: Profile;
-  };
-};
-
-const DATE_FORMAT = 'd MMM yyyy, HH:mm';
-
 const ChatMessages = ({
   name,
   member,
@@ -42,23 +44,27 @@ const ChatMessages = ({
   type,
 }: ChatMessagesProps) => {
   const queryKey = `chat:${chatId}`;
-  const addKey = `chat:${chatId}:messages`
-  const updateKey = `chat:${chatId}:messages:update`
+  const addKey = `chat:${chatId}:messages`;
+  const updateKey = `chat:${chatId}:messages:update`;
 
   const chatRef = useRef<ElementRef<'div'>>(null);
-  const bottomRef = useRef<ElementRef<'div'>>(null)
+  const bottomRef = useRef<ElementRef<'div'>>(null);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
-    useChatQuery({ apiUrl, paramKey, paramValue, queryKey });
-  
-    useChatSocket({addKey,queryKey,updateKey});
-    useChatScroll({
-      chatRef,
-      bottomRef,
-      loadMore: fetchNextPage,
-      shouldLoadMore: !isFetchingNextPage && !!hasNextPage,
-      count: data?.pages?.[0]?.items?.length ?? 0,
+    useChatQuery({
+      queryKey,
+      apiUrl,
+      paramKey,
+      paramValue,
     });
+  useChatSocket({ queryKey, addKey, updateKey });
+  useChatScroll({
+    chatRef,
+    bottomRef,
+    loadMore: fetchNextPage,
+    shouldLoadMore: !isFetchingNextPage && !!hasNextPage,
+    count: data?.pages?.[0]?.items?.length ?? 0,
+  });
 
   if (status === 'loading') {
     return (
@@ -103,7 +109,7 @@ const ChatMessages = ({
       <div className="flex flex-col-reverse mt-auto">
         {data?.pages?.map((group, i) => (
           <Fragment key={i}>
-            {group.items?.map((message: MessageWithMemberWithProfile) => (
+            {group.items.map((message: MessageWithMemberWithProfile) => (
               <ChatItem
                 key={message.id}
                 id={message.id}
